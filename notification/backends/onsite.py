@@ -49,11 +49,12 @@ class OnSiteBackend(backends.BaseBackend):
         if sender.__class__.__name__ == 'Company':
             sender = sender.admin_primary if sender.admin_primary else sender.created_by
 
-        Notice.objects.create(
-            recipient=recipient,
-            notice_type=notice_type,
-            sender=sender,
-            message=messages['full.html'],
-            on_site=True,
-            target_url=target_url
-        )
+        if settings.PRODUCTION_SETTING:
+            Notice.objects.create(
+                recipient=recipient,
+                notice_type=notice_type,
+                sender=sender,
+                message=messages['full.html'],
+                on_site=True,
+                target_url=target_url
+            )
