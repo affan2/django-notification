@@ -21,7 +21,10 @@ class EmailBackend(backends.BaseBackend):
         #postman stuff
 
         recipient = User.objects.get(id=recipient.id)
-        sender = User.objects.get(id=sender.id)
+        # try:
+        #     sender = User.objects.get(id=sender.id)
+        # except User.DoesNotExist:
+        #     pass
 
         if 'target' in extra_context:
             target = extra_context['target']
