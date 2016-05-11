@@ -1,8 +1,10 @@
 from django.conf import settings
 from django.core.mail import send_mail
+from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext
+from django.utils import translation
 
 from notification import backends
 
@@ -25,10 +27,21 @@ class EmailBackend(backends.BaseBackend):
         #     sender = User.objects.get(id=sender.id)
         # except User.DoesNotExist:
         #     pass
+        if 'language_code' in extra_context.keys():
+            for language_tuple in settings.LANGUAGES:
+                if extra_context['language_code'] in language_tuple:
+                    language_code = language_tuple[0]
+                    break
+        else:
+            try:
+                language_code = recipient.user_profile.default_language
+            except ObjectDoesNotExist:
+                language_code = 'en'
+
+        translation.activate(language_code)
 
         if 'target' in extra_context:
             target = extra_context['target']
-
 
         if 'disallow_notice' in extra_context:
             if 'email' in extra_context['disallow_notice']:
