@@ -21,7 +21,6 @@ class EmailBackend(backends.BaseBackend):
     def deliver(self, recipient, sender, notice_type, extra_context):
         # TODO: require this to be passed in extra_context
         #postman stuff
-        rdb.set_trace()
         recipient = User.objects.get(id=recipient.id)
         if 'language_code' in extra_context.keys():
             for language_tuple in settings.LANGUAGES:
