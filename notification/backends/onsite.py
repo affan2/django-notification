@@ -1,6 +1,9 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.template import Context
 from django.utils.translation import ugettext
+from django.utils import translation
 
 from notification import backends
 
@@ -20,6 +23,24 @@ class OnSiteBackend(backends.BaseBackend):
         if 'disallow_notice' in extra_context:
             if 'onsite' in extra_context['disallow_notice']:
                 return
+
+        recipient = User.objects.get(id=recipient.id)
+        if 'language_code' in extra_context.keys():
+            for language_tuple in settings.LANGUAGES:
+                if extra_context['language_code'] in language_tuple:
+                    language_code = language_tuple[0]
+                    break
+        else:
+            try:
+                language_code = recipient.user_profile.default_language
+            except ObjectDoesNotExist:
+                language_code = 'en'
+
+        translation.activate(language_code)
+        if 'target' in extra_context and hasattr(extra_context['target'], 'translations'):
+            from general.utils import switch_language
+            target = extra_context['target']
+            extra_context['target'] = switch_language(target, language_code)
 
         if 'pm_message' in extra_context:
             sender = extra_context['pm_message'].sender

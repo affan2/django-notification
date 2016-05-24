@@ -34,9 +34,10 @@ class EmailBackend(backends.BaseBackend):
                 language_code = 'en'
 
         translation.activate(language_code)
-
-        if 'target' in extra_context:
+        if 'target' in extra_context and hasattr(extra_context['target'], 'translations'):
+            from general.utils import switch_language
             target = extra_context['target']
+            extra_context['target'] = switch_language(target, language_code)
 
         if 'disallow_notice' in extra_context:
             if 'email' in extra_context['disallow_notice']:
