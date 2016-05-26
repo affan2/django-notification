@@ -22,18 +22,20 @@ class EmailBackend(backends.BaseBackend):
         # TODO: require this to be passed in extra_context
         #postman stuff
         recipient = User.objects.get(id=recipient.id)
+
+        try:
+            language_code = recipient.user_profile.default_language
+        except ObjectDoesNotExist:
+            language_code = 'en'
+
+        translation.activate(language_code)
+
         if 'language_code' in extra_context.keys():
             for language_tuple in settings.LANGUAGES:
                 if extra_context['language_code'] in language_tuple:
                     language_code = language_tuple[0]
                     break
-        else:
-            try:
-                language_code = recipient.user_profile.default_language
-            except ObjectDoesNotExist:
-                language_code = 'en'
 
-        translation.activate(language_code)
         if 'target' in extra_context and hasattr(extra_context['target'], 'translations'):
             from general.utils import switch_language
             target = extra_context['target']
