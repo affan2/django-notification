@@ -78,7 +78,8 @@ class EmailBackend(backends.BaseBackend):
         recipients = ['"%s" <%s>' % (recipient.get_full_name(), recipient.email)]
 
         if settings.PRODUCTION_SETTING:
-            send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, recipients)
+            if recipient.is_active:
+                send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, recipients)
         else:
             for admin in settings.ADMINS:
                 user = User.objects.get(email=admin[1])
