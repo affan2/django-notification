@@ -20,6 +20,7 @@ class EmailBackend(backends.BaseBackend):
 
     def deliver(self, recipient, sender, notice_type, extra_context):
         # TODO: require this to be passed in extra_context
+        from notification.models import Notice
         #postman stuff
         recipient = User.objects.get(id=recipient.id)
         language_code = 'en'
@@ -60,8 +61,7 @@ class EmailBackend(backends.BaseBackend):
         context.update(extra_context)
 
         try:
-            messages = self.get_formatted_messages(( "short.txt", "full.txt",), context['app_label'], context)
-
+            messages = self.get_formatted_messages(("short.txt", "full.txt",), context['app_label'], context)
         except:
             messages = self.get_formatted_messages((
                 "short.txt",
@@ -77,8 +77,16 @@ class EmailBackend(backends.BaseBackend):
         }, context)
         recipients = ['"%s" <%s>' % (recipient.get_full_name(), recipient.email)]
 
-        if settings.PRODUCTION_SETTING:
-            if recipient.is_active:
+        if settings.PRODUCTION_SETTING and recipient.is_active:
+            try:
+                Notice.objects.get(
+                    recipient=recipient,
+                    notice_type=notice_type,
+                    sender=sender,
+                    target_url=target_url,
+                    on_site=True
+                )
+            except Notice.DoesNotExist:
                 send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, recipients)
         else:
             for admin in settings.ADMINS:

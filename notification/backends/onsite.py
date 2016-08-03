@@ -72,11 +72,20 @@ class OnSiteBackend(backends.BaseBackend):
             sender = sender.admin_primary if sender.admin_primary else sender.created_by
 
         if settings.PRODUCTION_SETTING and recipient.is_active:
-            Notice.objects.create(
-                recipient=recipient,
-                notice_type=notice_type,
-                sender=sender,
-                message=messages['full.html'],
-                on_site=True,
-                target_url=target_url
-            )
+            try:
+                Notice.objects.get(
+                    recipient=recipient,
+                    notice_type=notice_type,
+                    sender=sender,
+                    target_url=target_url,
+                    on_site=True
+                )
+            except Notice.DoesNotExist:
+                Notice.objects.create(
+                    recipient=recipient,
+                    notice_type=notice_type,
+                    sender=sender,
+                    message=messages['full.html'],
+                    on_site=True,
+                    target_url=target_url
+                )
