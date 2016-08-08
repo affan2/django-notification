@@ -77,19 +77,20 @@ class EmailBackend(backends.BaseBackend):
         }, context)
         recipients = ['"%s" <%s>' % (recipient.get_full_name(), recipient.email)]
 
-        if settings.PRODUCTION_SETTING and recipient.is_active:
-            try:
-                Notice.objects.get(
-                    recipient=recipient,
-                    notice_type=notice_type,
-                    sender=sender,
-                    target_url=target_url,
-                    on_site=True
-                )
-            except Notice.DoesNotExist:
-                send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, recipients)
-        else:
-            for admin in settings.ADMINS:
-                user = User.objects.get(email=admin[1])
-                recipients = ['"%s" <%s>' % (user.get_full_name(), user.email)]
-                send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, recipients)
+        if recipient.is_active:
+            if settings.PRODUCTION_SETTING:
+                try:
+                    Notice.objects.get(
+                        recipient=recipient,
+                        notice_type=notice_type,
+                        sender=sender,
+                        target_url=target_url,
+                        on_site=True
+                    )
+                except Notice.DoesNotExist:
+                    send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, recipients)
+            else:
+                for admin in settings.ADMINS:
+                    user = User.objects.get(email=admin[1])
+                    recipients = ['"%s" <%s>' % (user.get_full_name(), user.email)]
+                    send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, recipients)
