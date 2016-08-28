@@ -85,17 +85,20 @@ class EmailBackend(backends.BaseBackend):
                         notice_type=notice_type,
                         sender=sender,
                         target_url=target_url,
+                        on_site=False
                     )
                 except Notice.DoesNotExist:
-                    send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, recipients)
-            else:
-                for admin in settings.ADMINS:
-                    if Notice.objects.filter(
+                    Notice.objects.create(
                         recipient=recipient,
                         notice_type=notice_type,
                         sender=sender,
+                        message=messages['full.txt'],
                         target_url=target_url,
-                    ).count() < 2:
-                        user = User.objects.get(email=admin[1])
-                        recipients = ['"%s" <%s>' % (user.get_full_name(), user.email)]
-                        send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, recipients)
+                        on_site=False,
+                    )
+                    send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, recipients)
+            else:
+                for admin in settings.ADMINS:
+                    user = User.objects.get(email=admin[1])
+                    recipients = ['"%s" <%s>' % (user.get_full_name(), user.email)]
+                    send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, recipients)

@@ -62,7 +62,6 @@ class OnSiteBackend(backends.BaseBackend):
             messages = self.get_formatted_messages((
                 "full.html",
             ), context['app_label'], context)
-
         except:
             messages = self.get_formatted_messages((
                 "full.html",
@@ -87,6 +86,6 @@ class OnSiteBackend(backends.BaseBackend):
                         notice_type=notice_type,
                         sender=sender,
                         message=messages['full.html'],
+                        target_url=target_url,
                         on_site=True,
-                        target_url=target_url
                     )
