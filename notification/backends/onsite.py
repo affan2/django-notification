@@ -71,7 +71,7 @@ class OnSiteBackend(backends.BaseBackend):
             sender = sender.admin_primary if sender.admin_primary else sender.created_by
 
         if recipient.is_active:
-            if settings.PRODUCTION_SETTING:
+            if settings.PRODUCTION_SETTING or settings.DEVELOPMENT_SERVER:
                 try:
                     Notice.objects.get(
                         recipient=recipient,
