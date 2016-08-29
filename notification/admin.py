@@ -10,6 +10,7 @@ class NoticeTypeAdmin(admin.ModelAdmin):
 
 class NoticeSettingAdmin(admin.ModelAdmin):
     list_display = ["id", "user", "notice_type", "medium", "send"]
+    search_fields = ('user__first_name', 'notice_type__label', )
 
 
 class NoticeAdmin(admin.ModelAdmin):
