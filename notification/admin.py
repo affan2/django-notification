@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from notification.models import NoticeType, NoticeSetting, Notice, NoticeQueueBatch
+from notification.forms import NoticeSettingForm
 
 
 class NoticeTypeAdmin(admin.ModelAdmin):
@@ -11,6 +12,7 @@ class NoticeTypeAdmin(admin.ModelAdmin):
 class NoticeSettingAdmin(admin.ModelAdmin):
     list_display = ["id", "user", "notice_type", "medium", "send"]
     search_fields = ('user__email', 'user__first_name', 'notice_type__label', )
+    form = NoticeSettingForm
 
 
 class NoticeAdmin(admin.ModelAdmin):
