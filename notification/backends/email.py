@@ -87,6 +87,8 @@ class EmailBackend(backends.BaseBackend):
                         target_url=target_url,
                         on_site=False
                     )
+                except Notice.MultipleObjectsReturned:
+                    pass
                 except Notice.DoesNotExist:
                     Notice.objects.create(
                         recipient=recipient,

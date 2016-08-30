@@ -80,6 +80,8 @@ class OnSiteBackend(backends.BaseBackend):
                         target_url=target_url,
                         on_site=True
                     )
+                except Notice.MultipleObjectsReturned:
+                    pass
                 except Notice.DoesNotExist:
                     Notice.objects.create(
                         recipient=recipient,
