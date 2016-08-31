@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.template import Context
 from django.utils.translation import ugettext
 from django.utils import translation
+from django.utils import timezone
 
 from notification import backends
 
@@ -71,18 +72,24 @@ class OnSiteBackend(backends.BaseBackend):
             sender = sender.admin_primary if sender.admin_primary else sender.created_by
 
         if recipient.is_active:
+            create_notice = False
             if settings.PRODUCTION_SETTING or settings.DEVELOPMENT_SERVER:
                 try:
-                    Notice.objects.get(
+                    notice_obj = Notice.objects.filter(
                         recipient=recipient,
                         notice_type=notice_type,
                         sender=sender,
                         target_url=target_url,
                         on_site=True
-                    )
-                except Notice.MultipleObjectsReturned:
-                    pass
-                except Notice.DoesNotExist:
+                    ).order_by('-added')[0]
+                except IndexError:
+                    notice_obj = None
+                    create_notice = True
+
+                if notice_obj and (timezone.now()-notice_obj.added).seconds/60 > settings.TIME_INTERVAL_BTW_TWO_NOTIFICATION:
+                    create_notice = True
+
+                if create_notice:
                     Notice.objects.create(
                         recipient=recipient,
                         notice_type=notice_type,
