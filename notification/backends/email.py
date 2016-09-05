@@ -78,6 +78,9 @@ class EmailBackend(backends.BaseBackend):
         }, context)
         recipients = ['"%s" <%s>' % (recipient.get_full_name(), recipient.email)]
 
+        if sender.__class__.__name__ == 'Company':
+            sender = sender.admin_primary if sender.admin_primary else sender.created_by
+
         if recipient.is_active:
             create_notice = False
             if settings.PRODUCTION_SETTING:
