@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from notification.models import NoticeSetting
 
 MEDIUM_TYPES = (
-    ('', _('')),
+    ('', ''),
     (0, _('Email')),
     (1, _('On Site')),
 )
