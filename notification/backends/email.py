@@ -90,7 +90,8 @@ class EmailBackend(backends.BaseBackend):
                         notice_type=notice_type,
                         sender=sender,
                         target_url=target_url,
-                        on_site=False
+                        on_site=False,
+                        site_id=settings.SITE_ID
                     ).order_by('-added')[0]
                 except IndexError:
                     notice_obj = None
@@ -107,6 +108,7 @@ class EmailBackend(backends.BaseBackend):
                         message=messages['full.txt'],
                         target_url=target_url,
                         on_site=False,
+                        site_id=settings.SITE_ID
                     )
                     send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, recipients)
             else:

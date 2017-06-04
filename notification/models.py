@@ -13,6 +13,7 @@ from django.utils.translation import get_language, activate
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.six.moves import cPickle as pickle  # pylint: disable-msg=F
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 
 from .compat import AUTH_USER_MODEL
@@ -133,16 +134,16 @@ class NoticeManager(models.Manager):
         If unseen=False, return only seen notices.
         """
         if sent:
-            lookup_kwargs = {"sender": user}
+            lookup_kwargs = {"sender": user, 'site_id': settings.SITE_ID}
         else:
-            lookup_kwargs = {"recipient": user}
+            lookup_kwargs = {"recipient": user, 'site_id': settings.SITE_ID}
         qs = self.filter(**lookup_kwargs)
         if not archived:
             self.filter(archived=archived)
         if unseen is not None:
-            qs = qs.filter(unseen=unseen)
+            qs = qs.filter(unseen=unseen, site_id=settings.SITE_ID)
         if on_site is not None:
-            qs = qs.filter(on_site=on_site)
+            qs = qs.filter(on_site=on_site, site_id=settings.SITE_ID)
         return qs
 
     def unseen_count_for(self, recipient, **kwargs):
@@ -178,6 +179,7 @@ class Notice(models.Model):
     archived = models.BooleanField(_("archived"), default=False)
     on_site = models.BooleanField(_("on site"))
     target_url = models.URLField(_("target url"), null=True, blank=True)
+    site = models.ForeignKey(Site, related_name="notice_site", default=settings.SITE_ID, verbose_name='site')
 
     objects = NoticeManager()
 

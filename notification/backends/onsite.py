@@ -80,7 +80,8 @@ class OnSiteBackend(backends.BaseBackend):
                         notice_type=notice_type,
                         sender=sender,
                         target_url=target_url,
-                        on_site=True
+                        on_site=True,
+                        site_id=settings.SITE_ID
                     ).order_by('-added')[0]
                 except IndexError:
                     notice_obj = None
@@ -97,4 +98,5 @@ class OnSiteBackend(backends.BaseBackend):
                         message=messages['full.html'],
                         target_url=target_url,
                         on_site=True,
+                        site_id=settings.SITE_ID
                     )
