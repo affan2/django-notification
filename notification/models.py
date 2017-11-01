@@ -31,6 +31,7 @@ STATE_TYPES = (
     (-1, _('Deleted')),
     (0, _('Draft')),
     (1, _('Published')),
+    (2, _('Published - Staff only')),
 )
 
 class LanguageStoreNotAvailable(Exception):

@@ -28,6 +28,9 @@ def notice_settings(request):
             variable called ``form_label``, whose valid value is ``on``.
     """
     notice_types = NoticeType.objects.filter(state=1).order_by('display')
+    if request.user.is_staff:
+        notice_types = NoticeType.objects.filter(state__gte=1).order_by('display')
+
     settings_table = []
     for notice_type in notice_types:
         settings_row = []
