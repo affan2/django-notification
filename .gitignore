@@ -1,37 +1,44 @@
+MANIFEST
+.DS_Store
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
 *.py[cod]
 
-# C extensions
-*.so
-
-# Packages
-*.egg
-*.egg-info
-dist
-build
-eggs
-parts
-bin
-var
-sdist
-develop-eggs
+# Distribution / packaging
+.Python
+env/
+build/
+develop-eggs/
+dist/
+docs/_build/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
 .installed.cfg
-lib
-lib64
-__pycache__
+*.egg
+*.eggs
+.python-version
+
+# Pipfile
+Pipfile
+Pipfile.lock
 
 # Installer logs
 pip-log.txt
+pip-delete-this-directory.txt
 
 # Unit test / coverage reports
+htmlcov/
+.tox/
 .coverage
-.tox
+.cache
 nosetests.xml
+coverage.xml
 
-# Translations
-*.mo
-
-# Mr Developer
-.mr.developer.cfg
-.project
-.pydevproject
-.idea
+# IDEs
+.idea/
