@@ -1,7 +1,5 @@
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
 from django.utils.translation import ugettext
 from django.utils import translation
 from django.utils import timezone
@@ -10,18 +8,20 @@ from .base import BaseBackend
 from ..models import Notice
 
 
-class EmailBackend(BaseBackend):
+class OnSiteBackend(BaseBackend):
     spam_sensitivity = 0
 
-    def can_send(self, user, notice_type, scoping):
-        can_send = super(EmailBackend, self).can_send(user, notice_type, scoping)
-        if can_send and user.email:
+    def can_send(self, user, notice_type):
+        can_send = super(OnSiteBackend, self).can_send(user, notice_type)
+        if can_send:
             return True
         return False
 
     def deliver(self, recipient, sender, notice_type, extra_context):
-        # TODO: require this to be passed in extra_context
-        # postman stuff
+        if 'disallow_notice' in extra_context:
+            if 'onsite' in extra_context['disallow_notice']:
+                return
+
         recipient = settings.AUTH_USER_MODEL.objects.get(id=recipient.id)
         language_code = 'en'
         if 'language_code' in extra_context.keys():
@@ -41,10 +41,6 @@ class EmailBackend(BaseBackend):
             target = extra_context['target']
             extra_context['target'] = switch_language(target, language_code)
 
-        if 'disallow_notice' in extra_context:
-            if 'email' in extra_context['disallow_notice']:
-                return
-
         if 'pm_message' in extra_context:
             sender = extra_context['pm_message'].sender
 
@@ -62,40 +58,26 @@ class EmailBackend(BaseBackend):
 
         try:
             messages = self.get_formatted_messages((
-                "short.txt",
-                "full.txt",
+                "full.html",
             ), context['app_label'], context)
         except:
             messages = self.get_formatted_messages((
-                "short.txt",
-                "full.txt",
+                "full.html",
             ), notice_type.label, context)
-
-        context.update({
-            "message": messages["short.txt"],
-        })
-        subject = "".join(render_to_string("pinax/notifications/email_subject.txt", context).splitlines())
-
-        context.update({
-            "message": messages["full.txt"]
-        })
-        body = render_to_string("pinax/notifications/email_body.txt", context)
-
-        recipients = ['"%s" <%s>' % (recipient.get_full_name(), recipient.email)]
 
         if sender.__class__.__name__ == 'Company':
             sender = sender.admin_primary if sender.admin_primary else sender.created_by
 
         if recipient.is_active:
             create_notice = False
-            if settings.PRODUCTION_SETTING:
+            if settings.PRODUCTION_SETTING or settings.DEVELOPMENT_SERVER:
                 try:
                     notice_obj = Notice.objects.filter(
                         recipient=recipient,
                         notice_type=notice_type,
                         sender=sender,
                         target_url=target_url,
-                        on_site=False,
+                        on_site=True,
                         site_id=settings.SITE_ID
                     ).order_by('-added')[0]
                 except IndexError:
@@ -110,14 +92,8 @@ class EmailBackend(BaseBackend):
                         recipient=recipient,
                         notice_type=notice_type,
                         sender=sender,
-                        message=messages['full.txt'],
+                        message=messages['full.html'],
                         target_url=target_url,
-                        on_site=False,
+                        on_site=True,
                         site_id=settings.SITE_ID
                     )
-                    send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, recipients)
-            else:
-                for admin in settings.ADMINS:
-                    user = settings.AUTH_USER_MODEL.objects.get(email=admin[1])
-                    recipients = ['"%s" <%s>' % (user.get_full_name(), user.email)]
-                    send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, recipients)

@@ -19,6 +19,8 @@ class BaseBackend(object):
         Determines whether this backend is allowed to send a notification to
         the given user and notice_type.
         """
+        if notice_type.state < 1:
+            return False
         return hookset.notice_setting_for_user(user, notice_type, self.medium_id, scoping).send
 
     def deliver(self, recipient, sender, notice_type, extra_context):
@@ -47,5 +49,17 @@ class BaseBackend(object):
         return {
             "default_http_protocol": default_http_protocol,
             "current_site": current_site,
-            "base_url": base_url
+            "base_url": base_url,
+            "current_site_name": current_site.name,
         }
+
+    def get_target_url(self, extra_context, sender, recipient):
+        target_url = extra_context['target'].url if 'target' in extra_context and hasattr(extra_context['target'], 'url') else sender.get_absolute_url()
+        if 'target' in extra_context and recipient == extra_context['target']:
+            target_url = sender.get_absolute_url()
+        if 'pm_message' in extra_context:
+            target_url = extra_context['pm_message'].get_absolute_url()
+        if hasattr(target_url, '__call__'):
+            target_url = target_url()
+
+        return target_url

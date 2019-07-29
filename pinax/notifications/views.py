@@ -44,7 +44,9 @@ class NoticeSettingsView(TemplateView):
         setting.save()
 
     def settings_table(self):
-        notice_types = NoticeType.objects.all()
+        notice_types = NoticeType.objects.filter(state=1).order_by('display')
+        if self.request.user.is_staff:
+            notice_types = NoticeType.objects.filter(state__gte=1).order_by('display')
         table = []
         for notice_type in notice_types:
             row = []
