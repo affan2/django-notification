@@ -10,30 +10,30 @@ Usage:
 >>> try:
 ...     lock.acquire()
 ... except AlreadyLocked:
-...     print "somefile", "is locked already."
+...     print("somefile", "is locked already.")
 ... except LockFailed:
-...     print "somefile", "can\\'t be locked."
+...     print("somefile", "can\\'t be locked.")
 ... else:
-...     print "got lock"
+...     print("got lock")
 got lock
->>> print lock.is_locked()
+>>> print(lock.is_locked())
 True
 >>> lock.release()
 
 >>> lock = FileLock("somefile")
->>> print lock.is_locked()
+>>> print(lock.is_locked())
 False
 >>> with lock:
-...    print lock.is_locked()
+...    print(lock.is_locked())
 True
->>> print lock.is_locked()
+>>> print(lock.is_locked())
 False
 >>> # It is okay to lock twice from the same thread...
 >>> with lock:
 ...     lock.acquire()
 ...
 >>> # Though no counter is kept, so you can"t unlock multiple times...
->>> print lock.is_locked()
+>>> print(lock.is_locked())
 False
 
 Exceptions:
