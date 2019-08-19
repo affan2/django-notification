@@ -117,7 +117,7 @@ Here is an example of these rules applied:
             verbose_name = _("task")
             verbose_name_plural = _("tasks")
         
-        def __unicode__(self):
+        def __str__(self):
             return self.summary
         
         def save(self, **kwargs):

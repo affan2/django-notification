@@ -188,7 +188,7 @@ class Notice(models.Model):
 
     objects = NoticeManager()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.message
 
     def archive(self):
