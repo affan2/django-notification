@@ -1,5 +1,3 @@
-from __future__ import print_function, unicode_literals
-
 import base64
 import pickle
 
@@ -17,6 +15,8 @@ from django.utils.translation import activate, get_language
 from .conf import settings
 from .hooks import hookset
 from .utils import load_media_defaults
+
+from django.contrib.auth import get_user_model
 
 NOTICE_MEDIA, NOTICE_MEDIA_DEFAULTS = load_media_defaults()
 STATE_TYPES = (
@@ -90,7 +90,7 @@ class NoticeSetting(models.Model):
     """
 
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        get_user_model(),
         verbose_name=_("user"),
         on_delete=models.CASCADE
     )
@@ -174,17 +174,33 @@ class NoticeManager(models.Manager):
 
 
 class Notice(models.Model):
-
-    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="recieved_notices", verbose_name=_("recipient"))
-    sender = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, related_name="sent_notices", verbose_name=_("sender"))
+    recipient = models.ForeignKey(
+        get_user_model(),
+        related_name="received_notices",
+        verbose_name=_("recipient"),
+        on_delete=models.CASCADE
+    )
+    sender = models.ForeignKey(
+        get_user_model(),
+        null=True,
+        related_name="sent_notices",
+        verbose_name=_("sender"),
+        on_delete=models.CASCADE
+    )
     message = models.TextField(_("message"))
-    notice_type = models.ForeignKey(NoticeType, verbose_name=_("notice type"))
+    notice_type = models.ForeignKey(NoticeType, verbose_name=_("notice type"), on_delete=models.CASCADE)
     added = models.DateTimeField(_("added"), auto_now_add=True, editable=False)
     unseen = models.BooleanField(_("unseen"), default=True)
     archived = models.BooleanField(_("archived"), default=False)
     on_site = models.BooleanField(_("on site"))
     target_url = models.URLField(_("target url"), null=True, blank=True)
-    site = models.ForeignKey(Site, related_name="notice_site", default=settings.SITE_ID, verbose_name='site')
+    site = models.ForeignKey(
+        Site,
+        related_name="notice_site",
+        default=settings.SITE_ID,
+        verbose_name='site',
+        on_delete=models.CASCADE
+    )
 
     objects = NoticeManager()
 
@@ -218,15 +234,20 @@ class Notice(models.Model):
 
 
 class NoticeLastSeen(models.Model):
-    recipient = models.OneToOneField(settings.AUTH_USER_MODEL, related_name="notices_seen", verbose_name=_("recipient"))
-    notice = models.ForeignKey(Notice)
+    recipient = models.OneToOneField(
+        get_user_model(),
+        related_name="notices_seen",
+        verbose_name=_("recipient"),
+        on_delete=models.CASCADE
+    )
+    notice = models.ForeignKey(Notice, on_delete=models.CASCADE)
     seen = models.DateTimeField(_("seen"), auto_now=True, editable=False)
 
 
 class NoticeQueueBatch(models.Model):
     """
     A queued notice.
-    Denormalized data for a notice.
+    De-normalized data for a notice.
     """
     pickled_data = models.TextField()
 
@@ -247,13 +268,13 @@ def get_notification_language(user):
             raise LanguageStoreNotAvailable
     else:
         try:
-            language = settings.AUTH_USER_MODEL.objects.get(id=user.id)
+            language = get_user_model().objects.get(id=user.id)
             if not hasattr(language, "user_profile"):
                 raise LanguageStoreNotAvailable
             language = language.user_profile
             if hasattr(language, "default_language"):
                 return language.default_language
-        except (ImportError, ImproperlyConfigured, settings.AUTH_USER_MODEL.DoesNotExist):
+        except (ImportError, ImproperlyConfigured, get_user_model().DoesNotExist):
             raise LanguageStoreNotAvailable
 
 

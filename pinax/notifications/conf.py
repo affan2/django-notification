@@ -1,9 +1,8 @@
-from __future__ import unicode_literals
-
 import importlib
 
 from django.apps import apps as django_apps
-from django.conf import settings  # noqa
+# noqa
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
 from appconf import AppConf

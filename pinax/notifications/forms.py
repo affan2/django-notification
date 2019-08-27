@@ -1,4 +1,4 @@
-import autocomplete_light
+from old_dal.widgets import ChoiceWidget
 
 from django import forms
 from django.utils.translation import ugettext_lazy as _
@@ -16,5 +16,6 @@ class NoticeSettingForm(forms.ModelForm):
     class Meta(object):
         model = NoticeSetting
         widgets = {
-            'user': autocomplete_light.ChoiceWidget('UserAdminAutocomplete'),
+            'user': ChoiceWidget('UserAdminAutocomplete'),
         }
+        exclude = ()

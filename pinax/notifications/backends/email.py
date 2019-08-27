@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -7,7 +8,6 @@ from django.utils import translation
 from django.utils import timezone
 
 from .base import BaseBackend
-from ..models import Notice
 
 
 class EmailBackend(BaseBackend):
@@ -20,9 +20,11 @@ class EmailBackend(BaseBackend):
         return False
 
     def deliver(self, recipient, sender, notice_type, extra_context):
+        from ..models import Notice
+
         # TODO: require this to be passed in extra_context
         # postman stuff
-        recipient = settings.AUTH_USER_MODEL.objects.get(id=recipient.id)
+        recipient = get_user_model().objects.get(id=recipient.id)
         language_code = 'en'
         if 'language_code' in extra_context.keys():
             for language_tuple in settings.LANGUAGES:
@@ -118,6 +120,6 @@ class EmailBackend(BaseBackend):
                     send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, recipients)
             else:
                 for admin in settings.ADMINS:
-                    user = settings.AUTH_USER_MODEL.objects.get(email=admin[1])
+                    user = get_user_model().objects.get(email=admin[1])
                     recipients = ['"%s" <%s>' % (user.get_full_name(), user.email)]
                     send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, recipients)

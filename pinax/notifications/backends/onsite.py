@@ -1,11 +1,11 @@
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext
 from django.utils import translation
 from django.utils import timezone
 
 from .base import BaseBackend
-from ..models import Notice
 
 
 class OnSiteBackend(BaseBackend):
@@ -18,11 +18,13 @@ class OnSiteBackend(BaseBackend):
         return False
 
     def deliver(self, recipient, sender, notice_type, extra_context):
+        from ..models import Notice
+
         if 'disallow_notice' in extra_context:
             if 'onsite' in extra_context['disallow_notice']:
                 return
 
-        recipient = settings.AUTH_USER_MODEL.objects.get(id=recipient.id)
+        recipient = get_user_model().objects.get(id=recipient.id)
         language_code = 'en'
         if 'language_code' in extra_context.keys():
             for language_tuple in settings.LANGUAGES:
