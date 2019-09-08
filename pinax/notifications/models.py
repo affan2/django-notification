@@ -90,7 +90,7 @@ class NoticeSetting(models.Model):
     """
 
     user = models.ForeignKey(
-        get_user_model(),
+        settings.AUTH_USER_MODEL,
         verbose_name=_("user"),
         on_delete=models.CASCADE
     )
@@ -175,13 +175,13 @@ class NoticeManager(models.Manager):
 
 class Notice(models.Model):
     recipient = models.ForeignKey(
-        get_user_model(),
+        settings.AUTH_USER_MODEL,
         related_name="received_notices",
         verbose_name=_("recipient"),
         on_delete=models.CASCADE
     )
     sender = models.ForeignKey(
-        get_user_model(),
+        settings.AUTH_USER_MODEL,
         null=True,
         related_name="sent_notices",
         verbose_name=_("sender"),
