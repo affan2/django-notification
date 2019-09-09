@@ -235,7 +235,7 @@ class Notice(models.Model):
 
 class NoticeLastSeen(models.Model):
     recipient = models.OneToOneField(
-        get_user_model(),
+        settings.AUTH_USER_MODEL,
         related_name="notices_seen",
         verbose_name=_("recipient"),
         on_delete=models.CASCADE
