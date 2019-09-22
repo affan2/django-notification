@@ -50,6 +50,7 @@ class NoticeType(models.Model):
     class Meta:
         verbose_name = _("notice type")
         verbose_name_plural = _("notice types")
+        db_table = 'notification_noticetype'
 
     @classmethod
     def create(cls, label, display, past_tense, description, default=2, verbosity=1):
@@ -123,6 +124,7 @@ class NoticeSetting(models.Model):
         verbose_name = _("notice setting")
         verbose_name_plural = _("notice settings")
         unique_together = ("user", "notice_type", "medium", "scoping_content_type", "scoping_object_id")
+        db_table = 'notification_noticesetting'
 
 
 class NoticeManager(models.Manager):
@@ -228,6 +230,7 @@ class Notice(models.Model):
         ordering = ["-added"]
         verbose_name = _("notice")
         verbose_name_plural = _("notices")
+        db_table = 'notification_notice'
 
     def get_absolute_url(self):
         return reverse("notification_notice", args=[str(self.pk)])
@@ -243,6 +246,9 @@ class NoticeLastSeen(models.Model):
     notice = models.ForeignKey(Notice, on_delete=models.CASCADE)
     seen = models.DateTimeField(_("seen"), auto_now=True, editable=False)
 
+    class Meta:
+        db_table = 'notification_noticelastseen'
+
 
 class NoticeQueueBatch(models.Model):
     """
@@ -250,6 +256,9 @@ class NoticeQueueBatch(models.Model):
     De-normalized data for a notice.
     """
     pickled_data = models.TextField()
+
+    class Meta:
+        db_table = 'notification_noticequeuebatch'
 
 
 def get_notification_language(user):
