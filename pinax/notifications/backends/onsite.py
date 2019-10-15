@@ -11,7 +11,7 @@ from .base import BaseBackend
 class OnSiteBackend(BaseBackend):
     spam_sensitivity = 0
 
-    def can_send(self, user, notice_type):
+    def can_send(self, user, notice_type, scoping):
         can_send = super(OnSiteBackend, self).can_send(user, notice_type)
         if can_send:
             return True
