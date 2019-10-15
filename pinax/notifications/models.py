@@ -100,7 +100,7 @@ class NoticeSetting(models.Model):
         verbose_name=_("notice type"),
         on_delete=models.CASCADE
     )
-    medium = models.CharField(_("medium"), max_length=1, choices=NOTICE_MEDIA)
+    medium = models.CharField(_("medium"), max_length=1, choices=NOTICE_MEDIA, )
     send = models.BooleanField(_("send"), default=False)
     scoping_content_type = models.ForeignKey(
         ContentType,

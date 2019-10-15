@@ -65,7 +65,10 @@ class PinaxNotificationsAppConf(AppConf):
                     "NOTIFICATION_BACKENDS does not contain enough data."
                 )
             backend_instance = load_path_attr(backend_path)(medium_id, spam_sensitivity)
-            backends.append(((medium_id, label), backend_instance))
+            # Casting medium_id to str because the model's field is supposed to be a charfield.
+            # Otherwise, an int is passed, and an error occurs in the back-end complaining about ints.
+            # This may still result in some error in the future somewhere else.
+            backends.append(((str(medium_id), label), backend_instance))
         return dict(backends)
 
     def configure_get_language_model(self, value):
