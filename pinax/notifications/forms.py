@@ -1,7 +1,8 @@
-from old_dal.widgets import ChoiceWidget
-
 from django import forms
 from django.utils.translation import ugettext_lazy as _
+
+from dal import autocomplete
+
 from .models import NoticeSetting
 
 MEDIUM_TYPES = (
@@ -12,10 +13,14 @@ MEDIUM_TYPES = (
 
 
 class NoticeSettingForm(forms.ModelForm):
-
-    class Meta(object):
+    class Meta:
         model = NoticeSetting
         widgets = {
-            'user': ChoiceWidget('UserAdminAutocomplete'),
+            'user': autocomplete.ModelSelect2(
+                url='user-autocomplete',
+            ),
+            'notice_type': autocomplete.ModelSelect2(
+                url='noticetype-autocomplete',
+            ),
         }
         exclude = ()

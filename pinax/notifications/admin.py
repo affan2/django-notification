@@ -10,9 +10,19 @@ class NoticeTypeAdmin(admin.ModelAdmin):
 
 
 class NoticeSettingAdmin(admin.ModelAdmin):
-    list_display = ["id", "user", "notice_type", "medium", "send"]
+    list_display = ["id", "get_user", "get_notice_type", "medium", "send"]
     search_fields = ('user__email', 'user__first_name', 'notice_type__label', )
     form = NoticeSettingForm
+
+    exclude = ('scoping_content_type', 'scoping_object_id', 'scoping', )
+
+    def get_user(self, obj):
+        obj.user
+    get_user.short_description = 'user'
+
+    def get_notice_type(self, obj):
+        obj.notice_type
+    get_notice_type.short_description = 'notice_type'
 
 
 class NoticeAdmin(admin.ModelAdmin):
