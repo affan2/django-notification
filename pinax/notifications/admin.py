@@ -5,8 +5,10 @@ from .forms import NoticeSettingForm
 
 
 class NoticeTypeAdmin(admin.ModelAdmin):
-    list_display = ["label", "display", "past_tense", "description", "state", "default"]
+    list_display = ["label", "display", "past_tense", "description", "state", "default", ]
     list_editable = ('state', )
+
+    search_fields = ('label', )
 
 
 class NoticeSettingAdmin(admin.ModelAdmin):
@@ -17,16 +19,18 @@ class NoticeSettingAdmin(admin.ModelAdmin):
     exclude = ('scoping_content_type', 'scoping_object_id', 'scoping', )
 
     def get_user(self, obj):
-        obj.user
+        return obj.user
     get_user.short_description = 'user'
 
     def get_notice_type(self, obj):
-        obj.notice_type
+        return obj.notice_type
     get_notice_type.short_description = 'notice_type'
 
 
 class NoticeAdmin(admin.ModelAdmin):
     list_display = ["message", "recipient", "sender", "notice_type", "added", "unseen", "archived", "on_site"]
+
+    autocomplete_fields = ('recipient', 'sender', 'notice_type', )
 
 
 admin.site.register(NoticeQueueBatch)
