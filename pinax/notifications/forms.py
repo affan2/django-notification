@@ -10,10 +10,10 @@ class NoticeSettingForm(forms.ModelForm):
         model = NoticeSetting
         widgets = {
             'user': autocomplete.ModelSelect2(
-                url='user-autocomplete',
+                url='autocomplete:user-autocomplete',
             ),
             'notice_type': autocomplete.ModelSelect2(
-                url='noticetype-autocomplete',
+                url='autocomplete:noticetype-autocomplete',
             ),
         }
         exclude = ()
